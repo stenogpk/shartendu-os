@@ -61,16 +61,34 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
     }
 
     return _items.where((item) {
-      final text = [
+      final searchableText = [
         item.title,
         item.learned,
         item.category,
         item.source,
         item.insight,
         item.action,
+        item.result,
       ].join(' ').toLowerCase();
 
-      return text.contains(_searchQuery);
+      return searchableText.contains(_searchQuery);
+    }).toList();
+  }
+
+  List<KnowledgeItem> get _reviewItems {
+    final now = DateTime.now();
+
+    return _items.where((item) {
+      if (item.reviewDate == null) {
+        return false;
+      }
+
+      final reviewDate = item.reviewDate!;
+
+      return !item.actionCompleted &&
+          !reviewDate.isAfter(
+            DateTime(now.year, now.month, now.day, 23, 59, 59),
+          );
     }).toList();
   }
 
@@ -94,9 +112,28 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
-      builder: (context) {
-        return _AddKnowledgeSheet(
+      builder: (_) {
+        return _KnowledgeEditorSheet(
           categories: _categories,
+        );
+      },
+    );
+
+    if (saved == true) {
+      _loadKnowledge();
+    }
+  }
+
+  Future<void> _showEditKnowledge(KnowledgeItem item) async {
+    final saved = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) {
+        return _KnowledgeEditorSheet(
+          categories: _categories,
+          item: item,
         );
       },
     );
@@ -112,16 +149,45 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
-      builder: (context) {
+      builder: (_) {
         return _KnowledgeDetailsSheet(
           item: item,
+          onEdit: () async {
+            Navigator.pop(context);
+            await _showEditKnowledge(item);
+          },
           onDelete: () async {
             Navigator.pop(context);
             await _deleteKnowledge(item);
           },
+          onActionChanged: (completed) async {
+            await _updateActionStatus(item, completed);
+          },
         );
       },
     );
+  }
+
+  Future<void> _updateActionStatus(
+    KnowledgeItem item,
+    bool completed,
+  ) async {
+    final updated = KnowledgeItem(
+      id: item.id,
+      title: item.title,
+      learned: item.learned,
+      category: item.category,
+      source: item.source,
+      insight: item.insight,
+      action: item.action,
+      result: item.result,
+      actionCompleted: completed,
+      createdAt: item.createdAt,
+      reviewDate: item.reviewDate,
+    );
+
+    await StorageService.saveKnowledge(updated);
+    _loadKnowledge();
   }
 
   @override
@@ -146,6 +212,7 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
         child: Column(
           children: [
             _buildHeader(),
+            _buildReviewBanner(),
             _buildSearchBar(),
             Expanded(
               child: items.isEmpty
@@ -209,6 +276,73 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildReviewBanner() {
+    if (_reviewItems.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: colorScheme.primary.withValues(alpha: 0.07),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: colorScheme.primary.withValues(alpha: 0.12),
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: colorScheme.primary.withValues(alpha: 0.10),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.refresh_rounded,
+                size: 20,
+                color: colorScheme.primary,
+              ),
+            ),
+            const SizedBox(width: 11),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${_reviewItems.length} knowledge ${_reviewItems.length == 1 ? 'item' : 'items'} ready for review',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    'Review it and turn it into action.',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -309,7 +443,7 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
   }
 
   Widget _knowledgeCard(KnowledgeItem item) {
-    final hasAction = item.action.trim().isNotEmpty;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Card(
       elevation: 0,
@@ -345,9 +479,13 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
                   ),
                   const SizedBox(width: 10),
                   Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 15,
-                    color: Colors.grey.shade500,
+                    item.actionCompleted
+                        ? Icons.check_circle_rounded
+                        : Icons.arrow_forward_ios_rounded,
+                    size: item.actionCompleted ? 20 : 15,
+                    color: item.actionCompleted
+                        ? colorScheme.primary
+                        : Colors.grey.shade500,
                   ),
                 ],
               ),
@@ -365,6 +503,8 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
                       item.source,
                       Icons.link_outlined,
                     ),
+                  if (item.reviewDate != null)
+                    _reviewTag(item.reviewDate!),
                 ],
               ),
               const SizedBox(height: 14),
@@ -378,25 +518,28 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
                   color: Colors.grey.shade700,
                 ),
               ),
-              if (hasAction) ...[
+              if (item.action.trim().isNotEmpty) ...[
                 const SizedBox(height: 14),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .primary
-                        .withValues(alpha: 0.06),
+                    color: item.actionCompleted
+                        ? Colors.grey.shade100
+                        : colorScheme.primary.withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Icon(
-                        Icons.bolt_rounded,
+                        item.actionCompleted
+                            ? Icons.check_circle_outline
+                            : Icons.bolt_rounded,
                         size: 19,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: item.actionCompleted
+                            ? Colors.grey.shade600
+                            : colorScheme.primary,
                       ),
                       const SizedBox(width: 8),
                       Expanded(
@@ -404,10 +547,16 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
                           item.action,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                             height: 1.35,
+                            decoration: item.actionCompleted
+                                ? TextDecoration.lineThrough
+                                : null,
+                            color: item.actionCompleted
+                                ? Colors.grey.shade600
+                                : null,
                           ),
                         ),
                       ),
@@ -418,6 +567,50 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _reviewTag(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final reviewDay = DateTime(date.year, date.month, date.day);
+
+    final isDue = !reviewDay.isAfter(today);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 6,
+      ),
+      decoration: BoxDecoration(
+        color: isDue
+            ? Theme.of(context).colorScheme.errorContainer
+            : Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.event_outlined,
+            size: 14,
+            color: isDue
+                ? Theme.of(context).colorScheme.onErrorContainer
+                : Colors.grey.shade700,
+          ),
+          const SizedBox(width: 5),
+          Text(
+            isDue ? 'Review due' : _formatDate(date),
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: isDue
+                  ? Theme.of(context).colorScheme.onErrorContainer
+                  : Colors.grey.shade700,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -514,20 +707,27 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
       ),
     );
   }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
 }
 
-class _AddKnowledgeSheet extends StatefulWidget {
+class _KnowledgeEditorSheet extends StatefulWidget {
   final List<String> categories;
+  final KnowledgeItem? item;
 
-  const _AddKnowledgeSheet({
+  const _KnowledgeEditorSheet({
     required this.categories,
+    this.item,
   });
 
   @override
-  State<_AddKnowledgeSheet> createState() => _AddKnowledgeSheetState();
+  State<_KnowledgeEditorSheet> createState() =>
+      _KnowledgeEditorSheetState();
 }
 
-class _AddKnowledgeSheetState extends State<_AddKnowledgeSheet> {
+class _KnowledgeEditorSheetState extends State<_KnowledgeEditorSheet> {
   final _formKey = GlobalKey<FormState>();
 
   final _titleController = TextEditingController();
@@ -535,8 +735,32 @@ class _AddKnowledgeSheetState extends State<_AddKnowledgeSheet> {
   final _sourceController = TextEditingController();
   final _insightController = TextEditingController();
   final _actionController = TextEditingController();
+  final _resultController = TextEditingController();
 
   String _category = 'General';
+  DateTime? _reviewDate;
+  bool _actionCompleted = false;
+
+  bool get _isEditing => widget.item != null;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final item = widget.item;
+
+    if (item != null) {
+      _titleController.text = item.title;
+      _learnedController.text = item.learned;
+      _sourceController.text = item.source;
+      _insightController.text = item.insight;
+      _actionController.text = item.action;
+      _resultController.text = item.result;
+      _category = item.category;
+      _reviewDate = item.reviewDate;
+      _actionCompleted = item.actionCompleted;
+    }
+  }
 
   @override
   void dispose() {
@@ -545,7 +769,26 @@ class _AddKnowledgeSheetState extends State<_AddKnowledgeSheet> {
     _sourceController.dispose();
     _insightController.dispose();
     _actionController.dispose();
+    _resultController.dispose();
     super.dispose();
+  }
+
+  Future<void> _selectReviewDate() async {
+    final now = DateTime.now();
+
+    final selected = await showDatePicker(
+      context: context,
+      initialDate: _reviewDate ?? now,
+      firstDate: DateTime(now.year - 5),
+      lastDate: DateTime(now.year + 10),
+      helpText: 'Choose review date',
+    );
+
+    if (selected != null) {
+      setState(() {
+        _reviewDate = selected;
+      });
+    }
   }
 
   Future<void> _save() async {
@@ -553,15 +796,21 @@ class _AddKnowledgeSheetState extends State<_AddKnowledgeSheet> {
       return;
     }
 
+    final oldItem = widget.item;
+
     final item = KnowledgeItem(
-      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      id: oldItem?.id ??
+          DateTime.now().microsecondsSinceEpoch.toString(),
       title: _titleController.text.trim(),
       learned: _learnedController.text.trim(),
       category: _category,
       source: _sourceController.text.trim(),
       insight: _insightController.text.trim(),
       action: _actionController.text.trim(),
-      createdAt: DateTime.now(),
+      result: _resultController.text.trim(),
+      actionCompleted: _actionCompleted,
+      createdAt: oldItem?.createdAt ?? DateTime.now(),
+      reviewDate: _reviewDate,
     );
 
     await StorageService.saveKnowledge(item);
@@ -606,20 +855,29 @@ class _AddKnowledgeSheetState extends State<_AddKnowledgeSheet> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  'Capture Knowledge',
-                  style: TextStyle(
+
+                Text(
+                  _isEditing
+                      ? 'Edit Knowledge'
+                      : 'Capture Knowledge',
+                  style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
+
                 const SizedBox(height: 5),
+
                 Text(
-                  'Record what matters, not everything.',
+                  _isEditing
+                      ? 'Refine what you learned and what you will do with it.'
+                      : 'Record what matters, not everything.',
                   style: TextStyle(
                     color: Colors.grey.shade600,
+                    height: 1.4,
                   ),
                 ),
+
                 const SizedBox(height: 22),
 
                 _field(
@@ -633,7 +891,9 @@ class _AddKnowledgeSheetState extends State<_AddKnowledgeSheet> {
                 const SizedBox(height: 14),
 
                 DropdownButtonFormField<String>(
-                  initialValue: _category,
+                  initialValue: _categoriesContains(_category)
+                      ? _category
+                      : 'General',
                   isExpanded: true,
                   decoration: _inputDecoration(
                     'Category',
@@ -699,14 +959,56 @@ class _AddKnowledgeSheetState extends State<_AddKnowledgeSheet> {
                   maxLines: 3,
                 ),
 
-                const SizedBox(height: 22),
+                const SizedBox(height: 14),
+
+                _field(
+                  controller: _resultController,
+                  label: 'Result',
+                  hint: 'What happened after applying it?',
+                  icon: Icons.track_changes_outlined,
+                  maxLines: 3,
+                ),
+
+                const SizedBox(height: 16),
+
+                _buildReviewDateSelector(),
+
+                const SizedBox(height: 8),
+
+                if (_actionController.text.trim().isNotEmpty ||
+                    _actionCompleted)
+                  CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    value: _actionCompleted,
+                    onChanged: (value) {
+                      setState(() {
+                        _actionCompleted = value ?? false;
+                      });
+                    },
+                    title: const Text(
+                      'Action completed',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    subtitle: const Text(
+                      'Mark this when you actually apply the knowledge.',
+                    ),
+                    controlAffinity: ListTileControlAffinity.leading,
+                  ),
+
+                const SizedBox(height: 16),
 
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
                     onPressed: _save,
                     icon: const Icon(Icons.check_rounded),
-                    label: const Text('Save Knowledge'),
+                    label: Text(
+                      _isEditing
+                          ? 'Save Changes'
+                          : 'Save Knowledge',
+                    ),
                     style: FilledButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                         vertical: 15,
@@ -717,6 +1019,51 @@ class _AddKnowledgeSheetState extends State<_AddKnowledgeSheet> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  bool _categoriesContains(String value) {
+    return widget.categories.contains(value);
+  }
+
+  Widget _buildReviewDateSelector() {
+    return InkWell(
+      onTap: _selectReviewDate,
+      borderRadius: BorderRadius.circular(16),
+      child: InputDecorator(
+        decoration: _inputDecoration(
+          'Review Date',
+          Icons.event_outlined,
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                _reviewDate == null
+                    ? 'Choose when to review this knowledge'
+                    : _formatDate(_reviewDate!),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: _reviewDate == null
+                      ? Colors.grey.shade500
+                      : null,
+                ),
+              ),
+            ),
+            if (_reviewDate != null)
+              IconButton(
+                tooltip: 'Clear review date',
+                onPressed: () {
+                  setState(() {
+                    _reviewDate = null;
+                  });
+                },
+                icon: const Icon(Icons.close),
+              ),
+          ],
         ),
       ),
     );
@@ -783,15 +1130,23 @@ class _AddKnowledgeSheetState extends State<_AddKnowledgeSheet> {
       ),
     );
   }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
 }
 
 class _KnowledgeDetailsSheet extends StatelessWidget {
   final KnowledgeItem item;
+  final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final Future<void> Function(bool completed) onActionChanged;
 
   const _KnowledgeDetailsSheet({
     required this.item,
+    required this.onEdit,
     required this.onDelete,
+    required this.onActionChanged,
   });
 
   @override
@@ -818,6 +1173,7 @@ class _KnowledgeDetailsSheet extends StatelessWidget {
                 ),
               ),
             ),
+
             const SizedBox(height: 22),
 
             Text(
@@ -846,6 +1202,12 @@ class _KnowledgeDetailsSheet extends StatelessWidget {
                     item.source,
                     Icons.link_outlined,
                   ),
+                if (item.reviewDate != null)
+                  _detailTag(
+                    context,
+                    'Review ${_formatDate(item.reviewDate!)}',
+                    Icons.event_outlined,
+                  ),
               ],
             ),
 
@@ -870,32 +1232,135 @@ class _KnowledgeDetailsSheet extends StatelessWidget {
 
             if (item.action.trim().isNotEmpty) ...[
               const SizedBox(height: 20),
+              _buildActionSection(context),
+            ],
+
+            if (item.result.trim().isNotEmpty) ...[
+              const SizedBox(height: 20),
               _detailSection(
                 context,
-                'Action',
-                item.action,
-                Icons.bolt_outlined,
+                'Result',
+                item.result,
+                Icons.track_changes_outlined,
               ),
             ],
 
             const SizedBox(height: 28),
 
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: onDelete,
-                icon: const Icon(Icons.delete_outline),
-                label: const Text('Delete'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Theme.of(context).colorScheme.error,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 14,
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: onEdit,
+                    icon: const Icon(Icons.edit_outlined),
+                    label: const Text('Edit'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 14,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: onDelete,
+                    icon: const Icon(Icons.delete_outline),
+                    label: const Text('Delete'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor:
+                          Theme.of(context).colorScheme.error,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 14,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildActionSection(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: item.actionCompleted
+            ? Colors.grey.shade50
+            : colorScheme.primary.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: item.actionCompleted
+              ? Colors.grey.shade200
+              : colorScheme.primary.withValues(alpha: 0.12),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                item.actionCompleted
+                    ? Icons.check_circle_rounded
+                    : Icons.bolt_outlined,
+                size: 20,
+                color: item.actionCompleted
+                    ? colorScheme.primary
+                    : colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  'Action',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          Text(
+            item.action,
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.55,
+              color: Colors.grey.shade800,
+              decoration: item.actionCompleted
+                  ? TextDecoration.lineThrough
+                  : null,
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          CheckboxListTile(
+            contentPadding: EdgeInsets.zero,
+            value: item.actionCompleted,
+            onChanged: (value) {
+              onActionChanged(value ?? false);
+            },
+            title: Text(
+              item.actionCompleted
+                  ? 'Action completed'
+                  : 'Mark action as completed',
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            controlAffinity: ListTileControlAffinity.leading,
+          ),
+        ],
       ),
     );
   }
@@ -906,7 +1371,9 @@ class _KnowledgeDetailsSheet extends StatelessWidget {
     IconData icon,
   ) {
     return Container(
-      constraints: const BoxConstraints(maxWidth: 260),
+      constraints: const BoxConstraints(
+        maxWidth: 280,
+      ),
       padding: const EdgeInsets.symmetric(
         horizontal: 11,
         vertical: 7,
@@ -927,7 +1394,7 @@ class _KnowledgeDetailsSheet extends StatelessWidget {
           Flexible(
             child: Text(
               text,
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 12,
@@ -990,5 +1457,9 @@ class _KnowledgeDetailsSheet extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
   }
 }
