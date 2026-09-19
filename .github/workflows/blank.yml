@@ -22,7 +22,7 @@ jobs:
 
       - name: Create Flutter project
         run: |
-          flutter create --platforms=android .
+          flutter create --project-name shartendu_os --platforms=android .
           flutter pub get
 
       - name: Commit Flutter project
