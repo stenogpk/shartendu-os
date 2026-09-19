@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../knowledge/knowledge_screen.dart';
+import '../reflection/reflection_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -13,10 +14,16 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  void _openReflection(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const ReflectionScreen(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -89,7 +96,7 @@ class HomeScreen extends StatelessWidget {
                       icon: Icons.psychology_outlined,
                       title: 'Reflection',
                       subtitle: 'Think → Improve',
-                      onTap: () {},
+                      onTap: () => _openReflection(context),
                     ),
                   ),
                 ],
@@ -113,6 +120,7 @@ class HomeScreen extends StatelessWidget {
               _quickCaptureCard(
                 context: context,
                 onKnowledgeTap: () => _openKnowledge(context),
+                onReflectionTap: () => _openReflection(context),
               ),
             ],
           ),
@@ -125,9 +133,9 @@ class HomeScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Good Morning, Shartendu',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 27,
             fontWeight: FontWeight.w700,
             height: 1.15,
@@ -308,9 +316,8 @@ class HomeScreen extends StatelessWidget {
   Widget _quickCaptureCard({
     required BuildContext context,
     required VoidCallback onKnowledgeTap,
+    required VoidCallback onReflectionTap,
   }) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Card(
       elevation: 0,
       margin: EdgeInsets.zero,
