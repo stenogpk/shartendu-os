@@ -6,8 +6,12 @@ on:
     branches:
       - main
 
+concurrency:
+  group: android-build
+  cancel-in-progress: true
+
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -26,7 +30,7 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Build APK
+      - name: Build release APK
         run: flutter build apk --release
 
       - name: Upload APK
