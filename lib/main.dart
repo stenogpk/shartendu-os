@@ -1,121 +1,238 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ShartenduOS());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class ShartenduOS extends StatelessWidget {
+  const ShartenduOS({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Shartendu OS',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+        colorSchemeSeed: const Color(0xFF3F5185),
+        scaffoldBackgroundColor: const Color(0xFFF8F9FA),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const HomeScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text(
+          'Shartendu OS',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.settings_outlined),
+          ),
+        ],
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Good Morning, Shartendu',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'आज क्या महत्वपूर्ण है?',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey.shade700,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              _sectionTitle('Today'),
+              const SizedBox(height: 10),
+
+              _dashboardCard(
+                icon: Icons.task_alt,
+                title: 'Today\'s Priorities',
+                subtitle: 'आज के महत्वपूर्ण काम',
+              ),
+
+              const SizedBox(height: 12),
+
+              _dashboardCard(
+                icon: Icons.timer_outlined,
+                title: 'Focus',
+                subtitle: 'एक समय में एक महत्वपूर्ण काम',
+              ),
+
+              const SizedBox(height: 20),
+
+              _sectionTitle('Personal Growth'),
+              const SizedBox(height: 10),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: _smallCard(
+                      icon: Icons.menu_book_outlined,
+                      title: 'Knowledge',
+                      subtitle: 'Knowledge Vault',
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _smallCard(
+                      icon: Icons.psychology_outlined,
+                      title: 'Reflection',
+                      subtitle: 'आज का आत्मचिंतन',
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 12),
+
+              _dashboardCard(
+                icon: Icons.explore_outlined,
+                title: 'Decision Journal',
+                subtitle: 'अपने निर्णय और उनके परिणाम दर्ज करें',
+              ),
+
+              const SizedBox(height: 20),
+
+              _sectionTitle('Quick Capture'),
+              const SizedBox(height: 10),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: _quickAction(
+                      icon: Icons.add_task,
+                      label: 'Task',
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _quickAction(
+                      icon: Icons.lightbulb_outline,
+                      label: 'Idea',
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _quickAction(
+                      icon: Icons.note_add_outlined,
+                      label: 'Knowledge',
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _sectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+
+  Widget _dashboardCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
+    return Card(
+      elevation: 0,
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 8,
+        ),
+        leading: CircleAvatar(
+          child: Icon(icon),
+        ),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        subtitle: Text(subtitle),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () {},
+      ),
+    );
+  }
+
+  Widget _smallCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
+    return Card(
+      elevation: 0,
+      child: Padding(
+        padding: const EdgeInsets.all(14),
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('You have pushed the button this many times:'),
+            Icon(icon, size: 28),
+            const SizedBox(height: 12),
             Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: const TextStyle(fontSize: 12),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+    );
+  }
+
+  Widget _quickAction({
+    required IconData icon,
+    required String label,
+  }) {
+    return OutlinedButton(
+      onPressed: () {},
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+      ),
+      child: Column(
+        children: [
+          Icon(icon),
+          const SizedBox(height: 6),
+          Text(label),
+        ],
       ),
     );
   }
