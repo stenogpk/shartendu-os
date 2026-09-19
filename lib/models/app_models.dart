@@ -6,6 +6,8 @@ class KnowledgeItem {
   final String source;
   final String insight;
   final String action;
+  final String result;
+  final bool actionCompleted;
   final DateTime createdAt;
   final DateTime? reviewDate;
 
@@ -17,6 +19,8 @@ class KnowledgeItem {
     required this.source,
     required this.insight,
     required this.action,
+    required this.result,
+    required this.actionCompleted,
     required this.createdAt,
     this.reviewDate,
   });
@@ -30,6 +34,8 @@ class KnowledgeItem {
       'source': source,
       'insight': insight,
       'action': action,
+      'result': result,
+      'actionCompleted': actionCompleted,
       'createdAt': createdAt.toIso8601String(),
       'reviewDate': reviewDate?.toIso8601String(),
     };
@@ -44,6 +50,8 @@ class KnowledgeItem {
       source: map['source']?.toString() ?? '',
       insight: map['insight']?.toString() ?? '',
       action: map['action']?.toString() ?? '',
+      result: map['result']?.toString() ?? '',
+      actionCompleted: map['actionCompleted'] == true,
       createdAt:
           DateTime.tryParse(map['createdAt']?.toString() ?? '') ??
           DateTime.now(),
