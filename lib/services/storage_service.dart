@@ -7,11 +7,13 @@ class StorageService {
   static const String reflectionBoxName = 'reflection_box';
   static const String decisionBoxName = 'decision_box';
   static const String taskBoxName = 'task_box';
+  static const String focusBoxName = 'focus_box';
 
   static late Box knowledgeBox;
   static late Box reflectionBox;
   static late Box decisionBox;
   static late Box taskBox;
+  static late Box focusBox;
 
   static Future<void> init() async {
     await Hive.initFlutter();
@@ -20,6 +22,7 @@ class StorageService {
     reflectionBox = await Hive.openBox(reflectionBoxName);
     decisionBox = await Hive.openBox(decisionBoxName);
     taskBox = await Hive.openBox(taskBoxName);
+    focusBox = await Hive.openBox(focusBoxName);
   }
 
   // ---------------- Knowledge ----------------
@@ -94,6 +97,24 @@ class StorageService {
     await taskBox.delete(id);
   }
 
+  // ---------------- Focus ----------------
+
+  static Future<void> saveFocusSession(FocusSession session) async {
+    await focusBox.put(session.id, session.toMap());
+  }
+
+  static List<FocusSession> getFocusSessions() {
+    return focusBox.values
+        .map((value) => FocusSession.fromMap(value))
+        .toList()
+        .reversed
+        .toList();
+  }
+
+  static Future<void> deleteFocusSession(String id) async {
+    await focusBox.delete(id);
+  }
+
   // ---------------- Utility ----------------
 
   static Future<void> clearAllPersonalData() async {
@@ -101,5 +122,6 @@ class StorageService {
     await reflectionBox.clear();
     await decisionBox.clear();
     await taskBox.clear();
+    await focusBox.clear();
   }
 }
