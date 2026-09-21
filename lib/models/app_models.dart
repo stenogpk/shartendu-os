@@ -52,8 +52,9 @@ class KnowledgeItem {
       action: map['action']?.toString() ?? '',
       result: map['result']?.toString() ?? '',
       actionCompleted: map['actionCompleted'] == true,
-      createdAt:
-          DateTime.tryParse(map['createdAt']?.toString() ?? '') ??
+      createdAt: DateTime.tryParse(
+            map['createdAt']?.toString() ?? '',
+          ) ??
           DateTime.now(),
       reviewDate: map['reviewDate'] == null
           ? null
@@ -93,7 +94,9 @@ class ReflectionEntry {
   factory ReflectionEntry.fromMap(Map<dynamic, dynamic> map) {
     return ReflectionEntry(
       id: map['id']?.toString() ?? '',
-      date: DateTime.tryParse(map['date']?.toString() ?? '') ??
+      date: DateTime.tryParse(
+            map['date']?.toString() ?? '',
+          ) ??
           DateTime.now(),
       proudOf: map['proudOf']?.toString() ?? '',
       wastedTime: map['wastedTime']?.toString() ?? '',
@@ -123,8 +126,8 @@ class DecisionEntry {
     required this.reasoning,
     required this.prediction,
     required this.result,
-    required this.createdAt,
     this.reviewDate,
+    required this.createdAt,
   });
 
   Map<String, dynamic> toMap() {
@@ -150,12 +153,62 @@ class DecisionEntry {
       reasoning: map['reasoning']?.toString() ?? '',
       prediction: map['prediction']?.toString() ?? '',
       result: map['result']?.toString() ?? '',
-      createdAt:
-          DateTime.tryParse(map['createdAt']?.toString() ?? '') ??
+      createdAt: DateTime.tryParse(
+            map['createdAt']?.toString() ?? '',
+          ) ??
           DateTime.now(),
       reviewDate: map['reviewDate'] == null
           ? null
           : DateTime.tryParse(map['reviewDate'].toString()),
+    );
+  }
+}
+
+class TaskItem {
+  final String id;
+  final String title;
+  final String description;
+  final String priority;
+  final bool completed;
+  final DateTime createdAt;
+  final DateTime? dueDate;
+
+  TaskItem({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.priority,
+    required this.completed,
+    required this.createdAt,
+    this.dueDate,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'priority': priority,
+      'completed': completed,
+      'createdAt': createdAt.toIso8601String(),
+      'dueDate': dueDate?.toIso8601String(),
+    };
+  }
+
+  factory TaskItem.fromMap(Map<dynamic, dynamic> map) {
+    return TaskItem(
+      id: map['id']?.toString() ?? '',
+      title: map['title']?.toString() ?? '',
+      description: map['description']?.toString() ?? '',
+      priority: map['priority']?.toString() ?? 'Medium',
+      completed: map['completed'] == true,
+      createdAt: DateTime.tryParse(
+            map['createdAt']?.toString() ?? '',
+          ) ??
+          DateTime.now(),
+      dueDate: map['dueDate'] == null
+          ? null
+          : DateTime.tryParse(map['dueDate'].toString()),
     );
   }
 }
