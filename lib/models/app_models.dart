@@ -212,3 +212,42 @@ class TaskItem {
     );
   }
 }
+
+class FocusSession {
+  final String id;
+  final int durationMinutes;
+  final DateTime startedAt;
+  final DateTime completedAt;
+
+  FocusSession({
+    required this.id,
+    required this.durationMinutes,
+    required this.startedAt,
+    required this.completedAt,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'durationMinutes': durationMinutes,
+      'startedAt': startedAt.toIso8601String(),
+      'completedAt': completedAt.toIso8601String(),
+    };
+  }
+
+  factory FocusSession.fromMap(Map<dynamic, dynamic> map) {
+    return FocusSession(
+      id: map['id']?.toString() ?? '',
+      durationMinutes:
+          int.tryParse(map['durationMinutes']?.toString() ?? '') ?? 0,
+      startedAt: DateTime.tryParse(
+            map['startedAt']?.toString() ?? '',
+          ) ??
+          DateTime.now(),
+      completedAt: DateTime.tryParse(
+            map['completedAt']?.toString() ?? '',
+          ) ??
+          DateTime.now(),
+    );
+  }
+}
