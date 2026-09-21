@@ -6,8 +6,10 @@ import '../growth/growth_screen.dart';
 import '../ideas/ideas_screen.dart';
 import '../knowledge/knowledge_screen.dart';
 import '../reflection/reflection_screen.dart';
+import '../review/smart_review_screen.dart';
 import '../settings/settings_screen.dart';
 import '../tasks/tasks_screen.dart';
+import '../today/today_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -15,20 +17,24 @@ class HomeScreen extends StatelessWidget {
   void _open(BuildContext context, Widget screen) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => screen),
+      MaterialPageRoute(
+        builder: (_) => screen,
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final colors = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           'Shartendu OS',
-          style: TextStyle(fontWeight: FontWeight.w800),
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+          ),
         ),
         actions: [
           IconButton(
@@ -54,7 +60,7 @@ class HomeScreen extends StatelessWidget {
             Text(
               'Learn something useful. Take action. Review your day.',
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: colorScheme.onSurfaceVariant,
+                color: colors.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 24),
@@ -66,14 +72,24 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
 
+            _featureCard(
+              context,
+              Icons.today_rounded,
+              'Today Dashboard',
+              'Priorities, overdue work, focus and reviews.',
+              () => _open(context, const TodayScreen()),
+            ),
+
+            const SizedBox(height: 10),
+
             Row(
               children: [
                 Expanded(
                   child: _actionCard(
                     context,
                     Icons.flag_outlined,
-                    'Today\'s Priorities',
-                    'Plan your important work',
+                    'Priorities',
+                    'Tasks',
                     () => _open(context, const TasksScreen()),
                   ),
                 ),
@@ -83,21 +99,21 @@ class HomeScreen extends StatelessWidget {
                     context,
                     Icons.center_focus_strong_rounded,
                     'Focus',
-                    'Work on one thing',
+                    'Deep work',
                     () => _open(context, const FocusScreen()),
                   ),
                 ),
               ],
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
 
             _featureCard(
               context,
-              Icons.insights_rounded,
-              'Growth Dashboard',
-              'See your learning, action and progress.',
-              () => _open(context, const GrowthScreen()),
+              Icons.auto_awesome_outlined,
+              'Smart Review',
+              'Close old loops and learn from outcomes.',
+              () => _open(context, const SmartReviewScreen()),
             ),
 
             const SizedBox(height: 28),
@@ -111,12 +127,22 @@ class HomeScreen extends StatelessWidget {
 
             _featureCard(
               context,
+              Icons.insights_rounded,
+              'Growth Dashboard',
+              'See your learning, action and progress.',
+              () => _open(context, const GrowthScreen()),
+            ),
+            const SizedBox(height: 10),
+
+            _featureCard(
+              context,
               Icons.menu_book_outlined,
               'Knowledge Vault',
               'Capture knowledge and turn it into action.',
               () => _open(context, const KnowledgeScreen()),
             ),
             const SizedBox(height: 10),
+
             _featureCard(
               context,
               Icons.self_improvement_outlined,
@@ -125,6 +151,7 @@ class HomeScreen extends StatelessWidget {
               () => _open(context, const ReflectionScreen()),
             ),
             const SizedBox(height: 10),
+
             _featureCard(
               context,
               Icons.account_balance_outlined,
@@ -178,7 +205,7 @@ class HomeScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: colorScheme.primaryContainer,
+                color: colors.primaryContainer,
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Row(
@@ -186,26 +213,27 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.loop_rounded,
-                    color: colorScheme.onPrimaryContainer,
+                    color: colors.onPrimaryContainer,
                     size: 28,
                   ),
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
                       children: [
                         Text(
                           'Growth Loop',
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w800,
-                            color: colorScheme.onPrimaryContainer,
+                            color: colors.onPrimaryContainer,
                           ),
                         ),
                         const SizedBox(height: 6),
                         Text(
                           'Knowledge → Insight → Action → Result → Review',
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onPrimaryContainer
+                            color: colors.onPrimaryContainer
                                 .withValues(alpha: 0.82),
                             height: 1.45,
                           ),
@@ -249,62 +277,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _actionCard(
-    BuildContext context,
-    IconData icon,
-    String title,
-    String subtitle,
-    VoidCallback onTap,
-  ) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(22),
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 150),
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: colorScheme.surface,
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.65),
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(
-              icon,
-              color: colorScheme.primary,
-              size: 28,
-            ),
-            const Spacer(),
-            const SizedBox(height: 18),
-            Text(
-              title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              subtitle,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _featureCard(
     BuildContext context,
     IconData icon,
@@ -313,7 +285,7 @@ class HomeScreen extends StatelessWidget {
     VoidCallback onTap,
   ) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final colors = theme.colorScheme;
 
     return InkWell(
       onTap: onTap,
@@ -321,10 +293,10 @@ class HomeScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(17),
         decoration: BoxDecoration(
-          color: colorScheme.surface,
+          color: colors.surface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.6),
+            color: colors.outlineVariant.withValues(alpha: 0.6),
           ),
         ),
         child: Row(
@@ -333,18 +305,19 @@ class HomeScreen extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: colorScheme.primaryContainer,
+                color: colors.primaryContainer,
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Icon(
                 icon,
-                color: colorScheme.onPrimaryContainer,
+                color: colors.onPrimaryContainer,
               ),
             ),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
@@ -360,7 +333,7 @@ class HomeScreen extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
+                      color: colors.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -369,7 +342,59 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(width: 8),
             Icon(
               Icons.chevron_right_rounded,
-              color: colorScheme.onSurfaceVariant,
+              color: colors.onSurfaceVariant,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _actionCard(
+    BuildContext context,
+    IconData icon,
+    String title,
+    String subtitle,
+    VoidCallback onTap,
+  ) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        constraints: const BoxConstraints(
+          minHeight: 110,
+        ),
+        padding: const EdgeInsets.all(17),
+        decoration: BoxDecoration(
+          color: colors.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: colors.outlineVariant.withValues(alpha: 0.6),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
+          children: [
+            Icon(
+              icon,
+              color: colors.primary,
+              size: 26,
+            ),
+            const Spacer(),
+            Text(
+              title,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              style: theme.textTheme.bodySmall,
             ),
           ],
         ),
@@ -384,7 +409,7 @@ class HomeScreen extends StatelessWidget {
     VoidCallback onTap,
   ) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final colors = theme.colorScheme;
 
     return InkWell(
       onTap: onTap,
@@ -395,17 +420,17 @@ class HomeScreen extends StatelessWidget {
           horizontal: 8,
         ),
         decoration: BoxDecoration(
-          color: colorScheme.surface,
+          color: colors.surface,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.6),
+            color: colors.outlineVariant.withValues(alpha: 0.6),
           ),
         ),
         child: Column(
           children: [
             Icon(
               icon,
-              color: colorScheme.primary,
+              color: colors.primary,
             ),
             const SizedBox(height: 8),
             Text(
