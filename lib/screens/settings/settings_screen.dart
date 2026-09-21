@@ -1,17 +1,119 @@
 import 'package:flutter/material.dart';
 
+import '../../services/backup_service.dart';
 import '../../services/storage_service.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
-  Future<void> _clearData(BuildContext context) async {
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  bool _busy = false;
+
+  Future<void> _backup() async {
+    setState(() {
+      _busy = true;
+    });
+
+    try {
+      await BackupService.shareBackup();
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Backup file created successfully.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Backup failed: $e'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _busy = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _restore() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Restore Backup?'),
+          content: const Text(
+            'Restoring will replace the current app data with the selected backup.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Continue'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+
+    setState(() {
+      _busy = true;
+    });
+
+    try {
+      final restored = await BackupService.restoreBackup();
+
+      if (!mounted) return;
+
+      if (restored) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Backup restored successfully.'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Restore failed: $e'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _busy = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _clearData() async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Clear All Personal Data?'),
         content: const Text(
-          'This will permanently delete your tasks, knowledge, reflections, decisions, ideas and focus history from this device.',
+          'This permanently deletes tasks, knowledge, reflections, decisions, ideas and focus history from this device.',
         ),
         actions: [
           TextButton(
@@ -30,7 +132,7 @@ class SettingsScreen extends StatelessWidget {
 
     await StorageService.clearAllPersonalData();
 
-    if (!context.mounted) return;
+    if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -56,38 +158,45 @@ class SettingsScreen extends StatelessWidget {
         children: [
           _section(
             context,
-            title: 'App',
-            children: [
+            'Data & Backup',
+            [
               ListTile(
-                leading: const Icon(Icons.person_outline_rounded),
-                title: const Text('Profile'),
-                subtitle: const Text('Shartendu'),
                 contentPadding: EdgeInsets.zero,
-              ),
-              ListTile(
-                leading: const Icon(Icons.info_outline_rounded),
-                title: const Text('About Shartendu OS'),
-                subtitle: const Text(
-                  'Personal development operating system',
+                leading: const Icon(Icons.upload_file_outlined),
+                title: const Text(
+                  'Backup My Data',
+                  style: TextStyle(fontWeight: FontWeight.w700),
                 ),
-                contentPadding: EdgeInsets.zero,
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          _section(
-            context,
-            title: 'Data',
-            children: [
-              ListTile(
-                leading: const Icon(Icons.storage_outlined),
-                title: const Text('Local Storage'),
                 subtitle: const Text(
-                  'Your current data is stored locally on this device.',
+                  'Create a complete offline backup file.',
                 ),
-                contentPadding: EdgeInsets.zero,
+                trailing: _busy
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Icon(Icons.chevron_right_rounded),
+                onTap: _busy ? null : _backup,
               ),
               ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.restore_page_outlined),
+                title: const Text(
+                  'Restore Backup',
+                  style: TextStyle(fontWeight: FontWeight.w700),
+                ),
+                subtitle: const Text(
+                  'Restore your data from a Shartendu OS backup.',
+                ),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: _busy ? null : _restore,
+              ),
+              const Divider(),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
                 leading: Icon(
                   Icons.delete_sweep_outlined,
                   color: theme.colorScheme.error,
@@ -102,23 +211,62 @@ class SettingsScreen extends StatelessWidget {
                 subtitle: const Text(
                   'Permanently remove all app data from this device.',
                 ),
-                contentPadding: EdgeInsets.zero,
-                onTap: () => _clearData(context),
+                onTap: _busy ? null : _clearData,
               ),
             ],
           ),
           const SizedBox(height: 20),
           _section(
             context,
-            title: 'About',
-            children: [
-              ListTile(
-                leading: const Icon(Icons.auto_awesome_outlined),
-                title: const Text('Shartendu OS'),
-                subtitle: const Text('Version 1.0.0'),
+            'App',
+            [
+              const ListTile(
                 contentPadding: EdgeInsets.zero,
+                leading: Icon(Icons.person_outline_rounded),
+                title: Text('Profile'),
+                subtitle: Text('Shartendu'),
+              ),
+              const ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(Icons.info_outline_rounded),
+                title: Text('About Shartendu OS'),
+                subtitle: Text(
+                  'Personal development operating system',
+                ),
+              ),
+              const ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(Icons.verified_outlined),
+                title: Text('Version'),
+                subtitle: Text('1.0.0'),
               ),
             ],
+          ),
+          const SizedBox(height: 20),
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.lock_outline_rounded,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Your personal data is currently stored locally on this device. Use Backup My Data to keep a separate copy.',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      height: 1.45,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -126,10 +274,10 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Widget _section(
-    BuildContext context, {
-    required String title,
-    required List<Widget> children,
-  }) {
+    BuildContext context,
+    String title,
+    List<Widget> children,
+  ) {
     final theme = Theme.of(context);
 
     return Container(
@@ -145,7 +293,10 @@ class SettingsScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 8, bottom: 4),
+            padding: const EdgeInsets.only(
+              top: 8,
+              bottom: 4,
+            ),
             child: Text(
               title,
               style: theme.textTheme.titleMedium?.copyWith(
