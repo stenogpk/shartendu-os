@@ -25,21 +25,19 @@ class KnowledgeItem {
     this.reviewDate,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'title': title,
-      'learned': learned,
-      'category': category,
-      'source': source,
-      'insight': insight,
-      'action': action,
-      'result': result,
-      'actionCompleted': actionCompleted,
-      'createdAt': createdAt.toIso8601String(),
-      'reviewDate': reviewDate?.toIso8601String(),
-    };
-  }
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'title': title,
+        'learned': learned,
+        'category': category,
+        'source': source,
+        'insight': insight,
+        'action': action,
+        'result': result,
+        'actionCompleted': actionCompleted,
+        'createdAt': createdAt.toIso8601String(),
+        'reviewDate': reviewDate?.toIso8601String(),
+      };
 
   factory KnowledgeItem.fromMap(Map<dynamic, dynamic> map) {
     return KnowledgeItem(
@@ -80,16 +78,14 @@ class ReflectionEntry {
     required this.tomorrowImprovement,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'date': date.toIso8601String(),
-      'proudOf': proudOf,
-      'wastedTime': wastedTime,
-      'learned': learned,
-      'tomorrowImprovement': tomorrowImprovement,
-    };
-  }
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'date': date.toIso8601String(),
+        'proudOf': proudOf,
+        'wastedTime': wastedTime,
+        'learned': learned,
+        'tomorrowImprovement': tomorrowImprovement,
+      };
 
   factory ReflectionEntry.fromMap(Map<dynamic, dynamic> map) {
     return ReflectionEntry(
@@ -130,19 +126,17 @@ class DecisionEntry {
     required this.createdAt,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'question': question,
-      'options': options,
-      'chosen': chosen,
-      'reasoning': reasoning,
-      'prediction': prediction,
-      'result': result,
-      'createdAt': createdAt.toIso8601String(),
-      'reviewDate': reviewDate?.toIso8601String(),
-    };
-  }
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'question': question,
+        'options': options,
+        'chosen': chosen,
+        'reasoning': reasoning,
+        'prediction': prediction,
+        'result': result,
+        'createdAt': createdAt.toIso8601String(),
+        'reviewDate': reviewDate?.toIso8601String(),
+      };
 
   factory DecisionEntry.fromMap(Map<dynamic, dynamic> map) {
     return DecisionEntry(
@@ -183,17 +177,15 @@ class TaskItem {
     this.dueDate,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'title': title,
-      'description': description,
-      'priority': priority,
-      'completed': completed,
-      'createdAt': createdAt.toIso8601String(),
-      'dueDate': dueDate?.toIso8601String(),
-    };
-  }
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'title': title,
+        'description': description,
+        'priority': priority,
+        'completed': completed,
+        'createdAt': createdAt.toIso8601String(),
+        'dueDate': dueDate?.toIso8601String(),
+      };
 
   factory TaskItem.fromMap(Map<dynamic, dynamic> map) {
     return TaskItem(
@@ -226,14 +218,12 @@ class FocusSession {
     required this.completedAt,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'durationMinutes': durationMinutes,
-      'startedAt': startedAt.toIso8601String(),
-      'completedAt': completedAt.toIso8601String(),
-    };
-  }
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'durationMinutes': durationMinutes,
+        'startedAt': startedAt.toIso8601String(),
+        'completedAt': completedAt.toIso8601String(),
+      };
 
   factory FocusSession.fromMap(Map<dynamic, dynamic> map) {
     return FocusSession(
@@ -246,6 +236,47 @@ class FocusSession {
           DateTime.now(),
       completedAt: DateTime.tryParse(
             map['completedAt']?.toString() ?? '',
+          ) ??
+          DateTime.now(),
+    );
+  }
+}
+
+class IdeaItem {
+  final String id;
+  final String title;
+  final String description;
+  final String category;
+  final bool convertedToAction;
+  final DateTime createdAt;
+
+  IdeaItem({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.category,
+    required this.convertedToAction,
+    required this.createdAt,
+  });
+
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'title': title,
+        'description': description,
+        'category': category,
+        'convertedToAction': convertedToAction,
+        'createdAt': createdAt.toIso8601String(),
+      };
+
+  factory IdeaItem.fromMap(Map<dynamic, dynamic> map) {
+    return IdeaItem(
+      id: map['id']?.toString() ?? '',
+      title: map['title']?.toString() ?? '',
+      description: map['description']?.toString() ?? '',
+      category: map['category']?.toString() ?? 'General',
+      convertedToAction: map['convertedToAction'] == true,
+      createdAt: DateTime.tryParse(
+            map['createdAt']?.toString() ?? '',
           ) ??
           DateTime.now(),
     );
