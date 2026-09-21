@@ -17,10 +17,16 @@ class HomeScreen extends StatelessWidget {
   void _open(BuildContext context, Widget screen) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => screen,
-      ),
+      MaterialPageRoute(builder: (_) => screen),
     );
+  }
+
+  String _greeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Good Morning, Shartendu';
+    if (hour < 17) return 'Good Afternoon, Shartendu';
+    if (hour < 21) return 'Good Evening, Shartendu';
+    return 'Good Night, Shartendu';
   }
 
   @override
@@ -30,58 +36,45 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Shartendu OS',
-          style: TextStyle(
-            fontWeight: FontWeight.w800,
-          ),
-        ),
+        title: const Text('Shartendu OS'),
         actions: [
           IconButton(
             tooltip: 'Settings',
-            onPressed: () {
-              _open(context, const SettingsScreen());
-            },
+            onPressed: () => _open(context, const SettingsScreen()),
             icon: const Icon(Icons.settings_outlined),
           ),
+          const SizedBox(width: 6),
         ],
       ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 36),
           children: [
             Text(
-              'Good Morning, Shartendu',
+              _greeting(),
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w800,
+                letterSpacing: -0.3,
               ),
             ),
             const SizedBox(height: 6),
             Text(
-              'Learn something useful. Take action. Review your day.',
+              'Learn. Act. Review. Improve.',
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: colors.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 24),
-
-            _sectionTitle(
-              context,
-              'Today',
-              'Your command center',
-            ),
-            const SizedBox(height: 12),
-
-            _featureCard(
+            const SizedBox(height: 22),
+            _sectionTitle(context, 'Today', 'Your command center'),
+            const SizedBox(height: 11),
+            _heroCard(
               context,
               Icons.today_rounded,
               'Today Dashboard',
               'Priorities, overdue work, focus and reviews.',
               () => _open(context, const TodayScreen()),
             ),
-
             const SizedBox(height: 10),
-
             Row(
               children: [
                 Expanded(
@@ -93,7 +86,7 @@ class HomeScreen extends StatelessWidget {
                     () => _open(context, const TasksScreen()),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 10),
                 Expanded(
                   child: _actionCard(
                     context,
@@ -105,27 +98,22 @@ class HomeScreen extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 10),
-
-            _featureCard(
+            _heroCard(
               context,
               Icons.auto_awesome_outlined,
               'Smart Review',
               'Close old loops and learn from outcomes.',
               () => _open(context, const SmartReviewScreen()),
             ),
-
-            const SizedBox(height: 28),
-
+            const SizedBox(height: 26),
             _sectionTitle(
               context,
               'Personal Growth',
               'Build awareness through practice',
             ),
-            const SizedBox(height: 12),
-
-            _featureCard(
+            const SizedBox(height: 11),
+            _heroCard(
               context,
               Icons.insights_rounded,
               'Growth Dashboard',
@@ -133,8 +121,7 @@ class HomeScreen extends StatelessWidget {
               () => _open(context, const GrowthScreen()),
             ),
             const SizedBox(height: 10),
-
-            _featureCard(
+            _heroCard(
               context,
               Icons.menu_book_outlined,
               'Knowledge Vault',
@@ -142,8 +129,7 @@ class HomeScreen extends StatelessWidget {
               () => _open(context, const KnowledgeScreen()),
             ),
             const SizedBox(height: 10),
-
-            _featureCard(
+            _heroCard(
               context,
               Icons.self_improvement_outlined,
               'Daily Reflection',
@@ -151,24 +137,20 @@ class HomeScreen extends StatelessWidget {
               () => _open(context, const ReflectionScreen()),
             ),
             const SizedBox(height: 10),
-
-            _featureCard(
+            _heroCard(
               context,
               Icons.account_balance_outlined,
               'Decision Journal',
               'Record decisions, reasoning and results.',
               () => _open(context, const DecisionScreen()),
             ),
-
-            const SizedBox(height: 28),
-
+            const SizedBox(height: 26),
             _sectionTitle(
               context,
               'Quick Capture',
               'Put the thought somewhere useful',
             ),
-            const SizedBox(height: 12),
-
+            const SizedBox(height: 11),
             Row(
               children: [
                 Expanded(
@@ -179,7 +161,7 @@ class HomeScreen extends StatelessWidget {
                     () => _open(context, const TasksScreen()),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 9),
                 Expanded(
                   child: _smallCard(
                     context,
@@ -188,7 +170,7 @@ class HomeScreen extends StatelessWidget {
                     () => _open(context, const IdeasScreen()),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 9),
                 Expanded(
                   child: _smallCard(
                     context,
@@ -199,14 +181,12 @@ class HomeScreen extends StatelessWidget {
                 ),
               ],
             ),
-
-            const SizedBox(height: 28),
-
+            const SizedBox(height: 26),
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(19),
               decoration: BoxDecoration(
                 color: colors.primaryContainer,
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(23),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -214,13 +194,12 @@ class HomeScreen extends StatelessWidget {
                   Icon(
                     Icons.loop_rounded,
                     color: colors.onPrimaryContainer,
-                    size: 28,
+                    size: 27,
                   ),
-                  const SizedBox(width: 14),
+                  const SizedBox(width: 13),
                   Expanded(
                     child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           'Growth Loop',
@@ -229,13 +208,14 @@ class HomeScreen extends StatelessWidget {
                             color: colors.onPrimaryContainer,
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 5),
                         Text(
                           'Knowledge → Insight → Action → Result → Review',
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: colors.onPrimaryContainer
-                                .withValues(alpha: 0.82),
-                            height: 1.45,
+                            color: colors.onPrimaryContainer.withValues(
+                              alpha: 0.82,
+                            ),
+                            height: 1.4,
                           ),
                         ),
                       ],
@@ -256,7 +236,6 @@ class HomeScreen extends StatelessWidget {
     String subtitle,
   ) {
     final theme = Theme.of(context);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -277,7 +256,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _featureCard(
+  Widget _heroCard(
     BuildContext context,
     IconData icon,
     String title,
@@ -287,64 +266,56 @@ class HomeScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.all(17),
-        decoration: BoxDecoration(
-          color: colors.surface,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: colors.outlineVariant.withValues(alpha: 0.6),
+    return Card(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: colors.primaryContainer,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Icon(icon, color: colors.onPrimaryContainer),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 7),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: colors.onSurfaceVariant,
+              ),
+            ],
           ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: colors.primaryContainer,
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Icon(
-                icon,
-                color: colors.onPrimaryContainer,
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colors.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            Icon(
-              Icons.chevron_right_rounded,
-              color: colors.onSurfaceVariant,
-            ),
-          ],
         ),
       ),
     );
@@ -360,43 +331,37 @@ class HomeScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        constraints: const BoxConstraints(
-          minHeight: 110,
-        ),
-        padding: const EdgeInsets.all(17),
-        decoration: BoxDecoration(
-          color: colors.surface,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: colors.outlineVariant.withValues(alpha: 0.6),
+    return Card(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: SizedBox(
+          height: 112,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(icon, color: colors.primary, size: 26),
+                const Spacer(),
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
+            ),
           ),
-        ),
-        child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
-          children: [
-            Icon(
-              icon,
-              color: colors.primary,
-              size: 26,
-            ),
-            const Spacer(),
-            Text(
-              title,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              subtitle,
-              style: theme.textTheme.bodySmall,
-            ),
-          ],
         ),
       ),
     );
@@ -411,37 +376,26 @@ class HomeScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          vertical: 18,
-          horizontal: 8,
-        ),
-        decoration: BoxDecoration(
-          color: colors.surface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: colors.outlineVariant.withValues(alpha: 0.6),
-          ),
-        ),
-        child: Column(
-          children: [
-            Icon(
-              icon,
-              color: colors.primary,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.w700,
+    return Card(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 17, horizontal: 6),
+          child: Column(
+            children: [
+              Icon(icon, color: colors.primary),
+              const SizedBox(height: 7),
+              Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
