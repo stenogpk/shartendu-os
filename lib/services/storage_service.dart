@@ -8,12 +8,14 @@ class StorageService {
   static const String decisionBoxName = 'decision_box';
   static const String taskBoxName = 'task_box';
   static const String focusBoxName = 'focus_box';
+  static const String ideaBoxName = 'idea_box';
 
   static late Box knowledgeBox;
   static late Box reflectionBox;
   static late Box decisionBox;
   static late Box taskBox;
   static late Box focusBox;
+  static late Box ideaBox;
 
   static Future<void> init() async {
     await Hive.initFlutter();
@@ -23,9 +25,8 @@ class StorageService {
     decisionBox = await Hive.openBox(decisionBoxName);
     taskBox = await Hive.openBox(taskBoxName);
     focusBox = await Hive.openBox(focusBoxName);
+    ideaBox = await Hive.openBox(ideaBoxName);
   }
-
-  // ---------------- Knowledge ----------------
 
   static Future<void> saveKnowledge(KnowledgeItem item) async {
     await knowledgeBox.put(item.id, item.toMap());
@@ -43,8 +44,6 @@ class StorageService {
     await knowledgeBox.delete(id);
   }
 
-  // ---------------- Reflection ----------------
-
   static Future<void> saveReflection(ReflectionEntry entry) async {
     await reflectionBox.put(entry.id, entry.toMap());
   }
@@ -60,8 +59,6 @@ class StorageService {
   static Future<void> deleteReflection(String id) async {
     await reflectionBox.delete(id);
   }
-
-  // ---------------- Decisions ----------------
 
   static Future<void> saveDecision(DecisionEntry entry) async {
     await decisionBox.put(entry.id, entry.toMap());
@@ -79,8 +76,6 @@ class StorageService {
     await decisionBox.delete(id);
   }
 
-  // ---------------- Tasks ----------------
-
   static Future<void> saveTask(TaskItem task) async {
     await taskBox.put(task.id, task.toMap());
   }
@@ -96,8 +91,6 @@ class StorageService {
   static Future<void> deleteTask(String id) async {
     await taskBox.delete(id);
   }
-
-  // ---------------- Focus ----------------
 
   static Future<void> saveFocusSession(FocusSession session) async {
     await focusBox.put(session.id, session.toMap());
@@ -115,7 +108,21 @@ class StorageService {
     await focusBox.delete(id);
   }
 
-  // ---------------- Utility ----------------
+  static Future<void> saveIdea(IdeaItem idea) async {
+    await ideaBox.put(idea.id, idea.toMap());
+  }
+
+  static List<IdeaItem> getIdeas() {
+    return ideaBox.values
+        .map((value) => IdeaItem.fromMap(value))
+        .toList()
+        .reversed
+        .toList();
+  }
+
+  static Future<void> deleteIdea(String id) async {
+    await ideaBox.delete(id);
+  }
 
   static Future<void> clearAllPersonalData() async {
     await knowledgeBox.clear();
@@ -123,5 +130,6 @@ class StorageService {
     await decisionBox.clear();
     await taskBox.clear();
     await focusBox.clear();
+    await ideaBox.clear();
   }
 }
