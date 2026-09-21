@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../decision/decision_screen.dart';
 import '../knowledge/knowledge_screen.dart';
 import '../reflection/reflection_screen.dart';
+import '../tasks/tasks_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -31,6 +32,14 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  void _openTasks(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const TasksScreen(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,7 +64,6 @@ class HomeScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 8),
 
-            // Greeting
             Text(
               'Good Morning, Shartendu',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -73,7 +81,6 @@ class HomeScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // Today
             _sectionTitle(
               context,
               'Today',
@@ -90,7 +97,7 @@ class HomeScreen extends StatelessWidget {
                     icon: Icons.flag_outlined,
                     title: 'Today\'s Priorities',
                     subtitle: 'Plan your most important work',
-                    onTap: () {},
+                    onTap: () => _openTasks(context),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -108,7 +115,6 @@ class HomeScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // Personal Growth
             _sectionTitle(
               context,
               'Personal Growth',
@@ -120,7 +126,8 @@ class HomeScreen extends StatelessWidget {
               context,
               icon: Icons.menu_book_outlined,
               title: 'Knowledge',
-              subtitle: 'Capture what you learn and turn it into action',
+              subtitle:
+                  'Capture what you learn and turn it into action',
               onTap: () => _openKnowledge(context),
             ),
 
@@ -130,7 +137,8 @@ class HomeScreen extends StatelessWidget {
               context,
               icon: Icons.edit_note_rounded,
               title: 'Daily Reflection',
-              subtitle: 'Understand your day and improve tomorrow',
+              subtitle:
+                  'Understand your day and improve tomorrow',
               onTap: () => _openReflection(context),
             ),
 
@@ -140,13 +148,13 @@ class HomeScreen extends StatelessWidget {
               context,
               icon: Icons.balance_rounded,
               title: 'Decision Journal',
-              subtitle: 'Record decisions, reasoning, predictions and results',
+              subtitle:
+                  'Record decisions, reasoning, predictions and results',
               onTap: () => _openDecision(context),
             ),
 
             const SizedBox(height: 24),
 
-            // Quick Capture
             _sectionTitle(
               context,
               'Quick Capture',
@@ -161,7 +169,7 @@ class HomeScreen extends StatelessWidget {
                     context,
                     icon: Icons.check_circle_outline_rounded,
                     title: 'Task',
-                    onTap: () {},
+                    onTap: () => _openTasks(context),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -187,7 +195,6 @@ class HomeScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // Core philosophy card
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -210,7 +217,8 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
                       children: [
                         const Text(
                           'Your growth loop',
@@ -253,16 +261,18 @@ class HomeScreen extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+                style:
+                    Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
               ),
               const SizedBox(height: 3),
               Text(
                 subtitle,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey.shade600,
-                    ),
+                style:
+                    Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.grey.shade600,
+                        ),
               ),
             ],
           ),
@@ -312,7 +322,8 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(width: 13),
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
