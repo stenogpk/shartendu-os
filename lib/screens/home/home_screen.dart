@@ -181,6 +181,7 @@ class HomeScreen extends StatelessWidget {
                     title: 'Knowledge',
                     onTap: () => _openKnowledge(context),
                   ),
+                ),
               ],
             ),
 
