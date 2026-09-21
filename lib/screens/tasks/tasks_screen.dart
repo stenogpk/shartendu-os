@@ -38,6 +38,7 @@ class _TasksScreenState extends State<TasksScreen> {
   }) async {
     final titleController =
         TextEditingController(text: existing?.title ?? '');
+
     final descriptionController =
         TextEditingController(text: existing?.description ?? '');
 
@@ -66,7 +67,8 @@ class _TasksScreenState extends State<TasksScreen> {
                   left: 20,
                   right: 20,
                   top: 14,
-                  bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                  bottom:
+                      MediaQuery.of(context).viewInsets.bottom + 20,
                 ),
                 child: SingleChildScrollView(
                   child: Form(
@@ -93,6 +95,7 @@ class _TasksScreenState extends State<TasksScreen> {
                           ),
                         ),
                         const SizedBox(height: 20),
+
                         TextFormField(
                           controller: titleController,
                           textInputAction: TextInputAction.next,
@@ -112,19 +115,23 @@ class _TasksScreenState extends State<TasksScreen> {
                             ),
                           ),
                           validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
+                            if (value == null ||
+                                value.trim().isEmpty) {
                               return 'Please enter a task title.';
                             }
                             return null;
                           },
                         ),
+
                         const SizedBox(height: 14),
+
                         TextFormField(
                           controller: descriptionController,
                           maxLines: 4,
                           decoration: InputDecoration(
                             labelText: 'Description',
-                            hintText: 'Add useful details if needed',
+                            hintText:
+                                'Add useful details if needed',
                             alignLabelWithHint: true,
                             prefixIcon: const Padding(
                               padding: EdgeInsets.only(
@@ -132,9 +139,7 @@ class _TasksScreenState extends State<TasksScreen> {
                                 right: 8,
                                 top: 12,
                               ),
-                              child: Icon(
-                                Icons.notes_outlined,
-                              ),
+                              child: Icon(Icons.notes_outlined),
                             ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -147,36 +152,54 @@ class _TasksScreenState extends State<TasksScreen> {
                             ),
                           ),
                         ),
+
                         const SizedBox(height: 18),
+
                         const Text(
                           'Priority',
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
                           ),
                         ),
+
                         const SizedBox(height: 8),
+
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
                           children: [
                             _priorityChoice(
-                              'High',
-                              priority,
-                              setSheetState,
+                              value: 'High',
+                              selected: priority,
+                              onSelected: (value) {
+                                setSheetState(() {
+                                  priority = value;
+                                });
+                              },
                             ),
                             _priorityChoice(
-                              'Medium',
-                              priority,
-                              setSheetState,
+                              value: 'Medium',
+                              selected: priority,
+                              onSelected: (value) {
+                                setSheetState(() {
+                                  priority = value;
+                                });
+                              },
                             ),
                             _priorityChoice(
-                              'Low',
-                              priority,
-                              setSheetState,
+                              value: 'Low',
+                              selected: priority,
+                              onSelected: (value) {
+                                setSheetState(() {
+                                  priority = value;
+                                });
+                              },
                             ),
                           ],
                         ),
+
                         const SizedBox(height: 18),
+
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(16),
@@ -188,9 +211,7 @@ class _TasksScreenState extends State<TasksScreen> {
                           ),
                           child: Row(
                             children: [
-                              const Icon(
-                                Icons.event_outlined,
-                              ),
+                              const Icon(Icons.event_outlined),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Column(
@@ -245,13 +266,17 @@ class _TasksScreenState extends State<TasksScreen> {
                                   }
                                 },
                                 child: Text(
-                                  dueDate == null ? 'Set' : 'Change',
+                                  dueDate == null
+                                      ? 'Set'
+                                      : 'Change',
                                 ),
                               ),
                             ],
                           ),
                         ),
+
                         const SizedBox(height: 24),
+
                         SizedBox(
                           width: double.infinity,
                           child: FilledButton.icon(
@@ -264,13 +289,16 @@ class _TasksScreenState extends State<TasksScreen> {
 
                               final task = TaskItem(
                                 id: existing?.id ??
-                                    now.microsecondsSinceEpoch.toString(),
+                                    now.microsecondsSinceEpoch
+                                        .toString(),
                                 title: titleController.text.trim(),
                                 description:
                                     descriptionController.text.trim(),
                                 priority: priority,
-                                completed: existing?.completed ?? false,
-                                createdAt: existing?.createdAt ?? now,
+                                completed:
+                                    existing?.completed ?? false,
+                                createdAt:
+                                    existing?.createdAt ?? now,
                                 dueDate: dueDate,
                               );
 
@@ -294,9 +322,11 @@ class _TasksScreenState extends State<TasksScreen> {
                                   : 'Save Changes',
                             ),
                             style: FilledButton.styleFrom(
-                              minimumSize: const Size.fromHeight(54),
+                              minimumSize:
+                                  const Size.fromHeight(54),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius:
+                                    BorderRadius.circular(16),
                               ),
                             ),
                           ),
@@ -316,20 +346,18 @@ class _TasksScreenState extends State<TasksScreen> {
     descriptionController.dispose();
   }
 
-  Widget _priorityChoice(
-    String value,
-    String selected,
-    StateSetter setSheetState,
-  ) {
+  Widget _priorityChoice({
+    required String value,
+    required String selected,
+    required ValueChanged<String> onSelected,
+  }) {
     final isSelected = value == selected;
 
     return ChoiceChip(
       label: Text(value),
       selected: isSelected,
       onSelected: (_) {
-        setSheetState(() {
-          // The parent editor owns this value.
-        });
+        onSelected(value);
       },
     );
   }
@@ -476,7 +504,8 @@ class _TasksScreenState extends State<TasksScreen> {
                       vertical: 4,
                     ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
                       children: [
                         Text(
                           task.title,
@@ -531,9 +560,7 @@ class _TasksScreenState extends State<TasksScreen> {
               IconButton(
                 tooltip: 'Delete',
                 onPressed: () => _deleteTask(task),
-                icon: const Icon(
-                  Icons.more_vert_rounded,
-                ),
+                icon: const Icon(Icons.more_vert_rounded),
               ),
             ],
           ),
@@ -542,7 +569,10 @@ class _TasksScreenState extends State<TasksScreen> {
     );
   }
 
-  Widget _infoChip(String label, Color color) {
+  Widget _infoChip(
+    String label,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 9,
