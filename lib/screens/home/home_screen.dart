@@ -2,55 +2,20 @@ import 'package:flutter/material.dart';
 
 import '../decision/decision_screen.dart';
 import '../focus/focus_screen.dart';
+import '../growth/growth_screen.dart';
+import '../ideas/ideas_screen.dart';
 import '../knowledge/knowledge_screen.dart';
 import '../reflection/reflection_screen.dart';
+import '../settings/settings_screen.dart';
 import '../tasks/tasks_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  void _openKnowledge(BuildContext context) {
+  void _open(BuildContext context, Widget screen) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => const KnowledgeScreen(),
-      ),
-    );
-  }
-
-  void _openReflection(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const ReflectionScreen(),
-      ),
-    );
-  }
-
-  void _openDecision(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const DecisionScreen(),
-      ),
-    );
-  }
-
-  void _openTasks(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const TasksScreen(),
-      ),
-    );
-  }
-
-  void _openFocus(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const FocusScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => screen),
     );
   }
 
@@ -63,14 +28,14 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'Shartendu OS',
-          style: TextStyle(
-            fontWeight: FontWeight.w800,
-          ),
+          style: TextStyle(fontWeight: FontWeight.w800),
         ),
         actions: [
           IconButton(
-            onPressed: () {},
             tooltip: 'Settings',
+            onPressed: () {
+              _open(context, const SettingsScreen());
+            },
             icon: const Icon(Icons.settings_outlined),
           ),
         ],
@@ -83,7 +48,6 @@ class HomeScreen extends StatelessWidget {
               'Good Morning, Shartendu',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w800,
-                letterSpacing: -0.5,
               ),
             ),
             const SizedBox(height: 6),
@@ -98,7 +62,7 @@ class HomeScreen extends StatelessWidget {
             _sectionTitle(
               context,
               'Today',
-              'What matters most right now',
+              'Your command center',
             ),
             const SizedBox(height: 12),
 
@@ -107,23 +71,33 @@ class HomeScreen extends StatelessWidget {
                 Expanded(
                   child: _actionCard(
                     context,
-                    icon: Icons.flag_outlined,
-                    title: 'Today\'s Priorities',
-                    subtitle: 'Tasks that matter today',
-                    onTap: () => _openTasks(context),
+                    Icons.flag_outlined,
+                    'Today\'s Priorities',
+                    'Plan your important work',
+                    () => _open(context, const TasksScreen()),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: _actionCard(
                     context,
-                    icon: Icons.center_focus_strong_rounded,
-                    title: 'Focus',
-                    subtitle: 'Deep work session',
-                    onTap: () => _openFocus(context),
+                    Icons.center_focus_strong_rounded,
+                    'Focus',
+                    'Work on one thing',
+                    () => _open(context, const FocusScreen()),
                   ),
                 ),
               ],
+            ),
+
+            const SizedBox(height: 12),
+
+            _featureCard(
+              context,
+              Icons.insights_rounded,
+              'Growth Dashboard',
+              'See your learning, action and progress.',
+              () => _open(context, const GrowthScreen()),
             ),
 
             const SizedBox(height: 28),
@@ -137,26 +111,26 @@ class HomeScreen extends StatelessWidget {
 
             _featureCard(
               context,
-              icon: Icons.menu_book_outlined,
-              title: 'Knowledge Vault',
-              subtitle: 'Capture knowledge and turn it into action.',
-              onTap: () => _openKnowledge(context),
+              Icons.menu_book_outlined,
+              'Knowledge Vault',
+              'Capture knowledge and turn it into action.',
+              () => _open(context, const KnowledgeScreen()),
             ),
             const SizedBox(height: 10),
             _featureCard(
               context,
-              icon: Icons.self_improvement_outlined,
-              title: 'Daily Reflection',
-              subtitle: 'Understand your day and improve tomorrow.',
-              onTap: () => _openReflection(context),
+              Icons.self_improvement_outlined,
+              'Daily Reflection',
+              'Understand your day and improve tomorrow.',
+              () => _open(context, const ReflectionScreen()),
             ),
             const SizedBox(height: 10),
             _featureCard(
               context,
-              icon: Icons.account_balance_outlined,
-              title: 'Decision Journal',
-              subtitle: 'Think clearly. Record reasoning. Review outcomes.',
-              onTap: () => _openDecision(context),
+              Icons.account_balance_outlined,
+              'Decision Journal',
+              'Record decisions, reasoning and results.',
+              () => _open(context, const DecisionScreen()),
             ),
 
             const SizedBox(height: 28),
@@ -171,29 +145,29 @@ class HomeScreen extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: _smallActionCard(
+                  child: _smallCard(
                     context,
-                    icon: Icons.check_circle_outline_rounded,
-                    title: 'Task',
-                    onTap: () => _openTasks(context),
+                    Icons.check_circle_outline_rounded,
+                    'Task',
+                    () => _open(context, const TasksScreen()),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: _smallActionCard(
+                  child: _smallCard(
                     context,
-                    icon: Icons.lightbulb_outline_rounded,
-                    title: 'Idea',
-                    onTap: () {},
+                    Icons.lightbulb_outline_rounded,
+                    'Idea',
+                    () => _open(context, const IdeasScreen()),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: _smallActionCard(
+                  child: _smallCard(
                     context,
-                    icon: Icons.school_outlined,
-                    title: 'Knowledge',
-                    onTap: () => _openKnowledge(context),
+                    Icons.school_outlined,
+                    'Knowledge',
+                    () => _open(context, const KnowledgeScreen()),
                   ),
                 ),
               ],
@@ -231,9 +205,9 @@ class HomeScreen extends StatelessWidget {
                         Text(
                           'Knowledge → Insight → Action → Result → Review',
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            height: 1.45,
                             color: colorScheme.onPrimaryContainer
                                 .withValues(alpha: 0.82),
+                            height: 1.45,
                           ),
                         ),
                       ],
@@ -276,12 +250,12 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _actionCard(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
+    BuildContext context,
+    IconData icon,
+    String title,
+    String subtitle,
+    VoidCallback onTap,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -332,12 +306,12 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _featureCard(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
+    BuildContext context,
+    IconData icon,
+    String title,
+    String subtitle,
+    VoidCallback onTap,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -403,12 +377,12 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _smallActionCard(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
+  Widget _smallCard(
+    BuildContext context,
+    IconData icon,
+    String title,
+    VoidCallback onTap,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
